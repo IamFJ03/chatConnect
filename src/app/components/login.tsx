@@ -1,6 +1,9 @@
 "use client"
+
+import { useRouter } from "next/navigation";
 import { useState } from "react"
 export default function Login() {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -28,7 +31,9 @@ export default function Login() {
 
         console.log("Status:", res.status);
         console.log("Message:", data?.message);
-
+        if(data?.message==="Login Successfull"){
+            router.push("/dashboard")
+        }
     }
 
     return (
