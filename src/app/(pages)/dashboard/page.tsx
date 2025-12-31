@@ -9,14 +9,18 @@ let socket: Socket;
 export default function Dashboard() {
   const {user} = useAuth();
   useEffect(() => {
+    if (!user) return;
+
     socket = io("/",{
       path: "/api/socket"
     });
     console.log("User data", user);
+
     socket.on("connect", () => {
       console.log("Connected with ID:", socket.id);
+      socket.emit("userRegister", {user});
     });
-
+    
     socket.on("message", (msg) => {
       console.log("Message received:", msg);
     });

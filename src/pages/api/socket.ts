@@ -19,15 +19,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
     });
 
     res.socket.server.io = io;
-
+    const UserMapping = new Map<string, string>()
     io.on("connection", (socket) => {
       console.log("New client connected:", socket.id);
+      
+      socket.on("userRegister", ({user}) => {
+        UserMapping.set(socket.id, user.id);
+        console.log("User",user.id,"Mapped to:",socket.id);
+      })
 
       socket.on("message", (msg) => {
         console.log("Message:", msg);
         io.emit("message", msg);
       });
-
+      
       socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);
       });
