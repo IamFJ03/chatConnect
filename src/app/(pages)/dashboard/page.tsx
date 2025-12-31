@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAuth } from "@/app/context/AuthContext";
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket;
 
 export default function Dashboard() {
+  const {user} = useAuth();
   useEffect(() => {
     socket = io("/",{
       path: "/api/socket"
     });
-
+    console.log("User data", user);
     socket.on("connect", () => {
       console.log("Connected with ID:", socket.id);
     });

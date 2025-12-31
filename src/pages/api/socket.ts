@@ -25,7 +25,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
 
       socket.on("message", (msg) => {
         console.log("Message:", msg);
-        io.emit("message", msg); // broadcast
+        io.emit("message", msg);
       });
 
       socket.on("disconnect", () => {

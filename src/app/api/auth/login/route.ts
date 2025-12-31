@@ -22,18 +22,15 @@ export async function POST(req: Request) {
 
         console.log(email, password)
         const search = await pool.query("Select * from users where email = $1",[email]);
-
-        if(search.rows.length===0) return Response.json({message:"User not found"},{status:401})
-
-        const user = search.rows[0];
-
+        if(search.rows.length===0) return Response.json({message:"User not Found"},{status:401});
+        const user = search.rows[0]
         const match = await bcrypt.compare(password, user.password);
-
-        if(!match) return Response.json({message:"Invalid Credentials"},{status:200});
-
-        return Response.json({ message: "Login Successfull" }, { status: 200 })
-    
-    
-
-
+        if(!match) return Response.json({message:"Invalid Credentials"},{status: 401});
+        
+        const userInfo = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+        }
+        return Response.json({ message: "Login Successfull", userInfo: userInfo }, { status: 200 })
 }
