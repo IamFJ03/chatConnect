@@ -21,8 +21,9 @@ export default function Dashboard() {
       console.log("Connected with ID:", socket.id);
       socket.emit("userRegister", { user });
     });
-
+    socket.on("receiveMessage", handleReceiveMsg);
     return () => {
+      socket.off("receiveMessage", handleReceiveMsg)
       socket.disconnect();
     };
   }, [user]);
@@ -30,6 +31,12 @@ export default function Dashboard() {
   const handleSendMg = () => {
     console.log("Message to be sent:", msg);
     socket.emit("message",{ReceiverId: user?.id, message: msg});
+  }
+
+  const handleReceiveMsg = (message: string) => {
+    
+console.log("Received Message", message)
+  
   }
 
   return (

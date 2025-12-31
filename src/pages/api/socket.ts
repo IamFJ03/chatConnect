@@ -30,7 +30,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
 
       socket.on("message", ({ReceiverId, message}) => {
         console.log("Receiver:", ReceiverId,"Message:", message);
-        
+        socket.broadcast.emit("receiveMessage", message);
       });
       
       socket.on("disconnect", () => {
