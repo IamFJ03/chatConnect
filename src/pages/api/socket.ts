@@ -28,9 +28,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
         console.log("User",user.id,"Mapped to:",socket.id);
       })
 
-      socket.on("message", (msg) => {
-        console.log("Message:", msg);
-        io.emit("message", msg);
+      socket.on("message", ({ReceiverId, message}) => {
+        console.log("Receiver:", ReceiverId,"Message:", message);
+        
       });
       
       socket.on("disconnect", () => {
