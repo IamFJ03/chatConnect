@@ -9,6 +9,8 @@ let socket: Socket;
 export default function Dashboard() {
   const { user } = useAuth();
   const [msg, setMsg] = useState("");
+  const [searchUser, setSearchUser] = useState("");
+
   useEffect(() => {
     if (!user) return;
 
@@ -21,28 +23,22 @@ export default function Dashboard() {
       console.log("Connected with ID:", socket.id);
       socket.emit("userRegister", { user });
     });
-    socket.on("receiveMessage", handleReceiveMsg);
+    
     return () => {
-      socket.off("receiveMessage", handleReceiveMsg)
+      
       socket.disconnect();
     };
   }, [user]);
 
-  const handleSendMg = () => {
-    console.log("Message to be sent:", msg);
-    socket.emit("message",{ReceiverId: user?.id, message: msg});
-  }
-
-  const handleReceiveMsg = (message: string) => {
-    
-console.log("Received Message", message)
-  
+  const handleSearchUser = () => {
+    socket.emit("searchUser", searchUser);
   }
 
   return (
     <div>
       <h2>Dashboard Page</h2>
-      <input type="text" value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Send Message..." className="border border-gray-600" /><button onClick={handleSendMg}>Send</button>
+      <p>Search User</p>
+      <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600" /><button onClick={handleSearchUser}>Search</button>
     </div>
   );
 }

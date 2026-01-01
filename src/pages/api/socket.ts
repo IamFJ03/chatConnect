@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { NextApiRequest } from "next";
 import { NextApiResponseServerIO } from "@/types/next";
-
+import { pool } from "@/lib/db";
 export const config = {
   api: {
     bodyParser: false,
@@ -26,6 +26,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
       socket.on("userRegister", ({user}) => {
         UserMapping.set(socket.id, user.id);
         console.log("User",user.id,"Mapped to:",socket.id);
+      })
+
+      socket.on("searchUser", async (searchUser) => {
+          console.log("User to be Searched...", searchUser);
+          const searched = await pool.query("select * from users where username = $1",[searchUser]);
+          if(searched.rows.length>0) console.log("User Found")
       })
 
       socket.on("message", ({ReceiverId, message}) => {
