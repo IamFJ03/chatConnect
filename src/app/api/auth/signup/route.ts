@@ -1,5 +1,5 @@
 import joi from "joi";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { pool } from "@/lib/db";
 
 const schema = joi.object({

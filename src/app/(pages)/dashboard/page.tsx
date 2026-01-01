@@ -30,8 +30,20 @@ export default function Dashboard() {
     };
   }, [user]);
 
-  const handleSearchUser = () => {
-    socket.emit("searchUser", searchUser);
+  const handleSearchUser = async () => {
+    try{
+      const res = await fetch(`/api/connection/user?s=${encodeURIComponent(searchUser)}`,{
+        method: "GET",
+      });
+      if(!res.ok) throw new Error("failed to fetch User");
+
+      const data = await res.json();
+      setSearchUser("");
+      console.log(data?.data);
+    }
+    catch (error) {
+    console.error("Search error:", error);
+  }
   }
 
   return (

@@ -1,5 +1,5 @@
 import joi from "joi";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { pool } from "@/lib/db";
 
 const schema = joi.object({
@@ -29,19 +29,19 @@ export async function POST(req: Request) {
     const { email, password } = value;
     console.log(email, password)
     const search = await pool.query("select * from users where email = $1",[email]);
+    
+    if(search.rows.length === 0) return Response.json({message:"User not Found"}, {status:201})
+
     const user = search.rows[0];
-    if(!user) return Response.json({message:"No User Found"},{status: 201})
 
-    const match = await bcrypt.compare(password, user.password)
-
-    if(!match) return Response.json({message:"Invalid Credentials"},{status:201})
+    const match = bcrypt.compare(password, user.password);
+    if(!match) return Response.json({message:"Invalid Credentials"},{status: 201});
 
     const userInfo = {
       id: user.id,
       username: user.username,
-      password: user.password
+      email: user.email
     }
-
     return Response.json(
       {
         message: "Login Successfull",
