@@ -9,7 +9,7 @@ let socket: Socket;
 type SearchedUser = {
   id: number,
   username: string,
-  emai: string
+  email: string
 }
 
 export default function Dashboard() {
@@ -30,9 +30,13 @@ export default function Dashboard() {
       console.log("Connected with ID:", socket.id);
       socket.emit("userRegister", { user });
     });
+
+    socket.on("request", (data) => {
+      console.log("Request Receivd From:", data.sender, data);
+    })
     
     return () => {
-      
+      socket.off("request");
       socket.disconnect();
     };
   }, [user]);
@@ -53,16 +57,30 @@ export default function Dashboard() {
     console.error("Search error:", error);
   }
   }
+  
+  const handlePermission = () => {
+    const newPermission = {
+      senderId: user?.id,
+      sender: user?.username,
+      receiverId: searchedUser?.id,
+      receiver: searchedUser?.username
+    }
+
+    console.log("Permission Request:", newPermission);
+    socket.emit("permissionRequest", newPermission);
+  }
 
   return (
     <div>
       <h2>Dashboard Page</h2>
       <div className="m-10">
       <p className="mb-5">Search User</p>
+
       <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
-      <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500">
-        {searchedUser && searchedUser.username}
-      </div>
+      {searchedUser &&
+      <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={handlePermission}>
+        {searchedUser?.username}
+      </div>}
       </div>
     </div>
   );

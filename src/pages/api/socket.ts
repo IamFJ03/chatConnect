@@ -24,7 +24,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
       console.log("New client connected:", socket.id);
       
       socket.on("userRegister", ({user}) => {
-        UserMapping.set(socket.id, user.id);
+        UserMapping.set(user.id, socket.id);
         console.log("User",user.id,"Mapped to:",socket.id);
       })
 
@@ -34,10 +34,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           if(searched.rows.length>0) console.log("User Found")
       })
 
-      socket.on("message", ({ReceiverId, message}) => {
-        console.log("Receiver:", ReceiverId,"Message:", message);
-        socket.broadcast.emit("receiveMessage", message);
-      });
+      socket.on("permissionRequest", (newPermission) => {
+          console.log("Server Triggered... got data...", newPermission);
+          const reciver = UserMapping.get(newPermission.receiverId);
+
+          if(reciver) 
+            io.to(reciver).emit("request", newPermission);
+      })
       
       socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);
