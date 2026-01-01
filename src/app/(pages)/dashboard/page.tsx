@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { io, Socket } from "socket.io-client";
+import { X } from "lucide-react";
 
 let socket: Socket;
 
@@ -14,7 +15,8 @@ type SearchedUser = {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [msg, setMsg] = useState("");
+  const[permissionModal, setPermissionModal] = useState(false);
+  const[notificationModal, setNotificationModal] = useState(false);
   const[searchedUser, setSearchedUser] = useState<SearchedUser | null>(null);
   const [searchUser, setSearchUser] = useState("");
 
@@ -67,6 +69,7 @@ export default function Dashboard() {
     }
 
     console.log("Permission Request:", newPermission);
+    
     socket.emit("permissionRequest", newPermission);
   }
 
@@ -78,9 +81,21 @@ export default function Dashboard() {
 
       <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
       {searchedUser &&
-      <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={handlePermission}>
+      <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setPermissionModal(true)}>
         {searchedUser?.username}
       </div>}
+      </div>
+      <div className={`fixed inset-0 ${permissionModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
+        <div className="md:w-70 w-[80%] ml-[10%] mt-[25%] md:h-70 bg-gray-800 rounded-2xl md:ml-[40%] md:mt-[10%]">
+          <X size={25} color="white" onClick={() => setPermissionModal(false)} className="relative md:left-60 left-75 top-3 cursor-pointer"/>
+            <div className="p-5 md:ml-7 ml-10 mt-3">
+              <p className="md:w-50 w-55">Request For Permission and start having chat...</p>
+              <p className="my-5">Username:{user?.username}</p>
+              <p className="mb-5">Reciver: {searchedUser?.username}</p>
+              <button className="bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setPermissionModal(false)}>Cancel</button>
+              <button className="ml-5 bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={handlePermission}>Send</button>
+            </div>
+        </div>
       </div>
     </div>
   );

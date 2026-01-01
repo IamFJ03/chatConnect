@@ -37,7 +37,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
       socket.on("permissionRequest", (newPermission) => {
           console.log("Server Triggered... got data...", newPermission);
           const reciver = UserMapping.get(newPermission.receiverId);
-
+          
           if(reciver) 
             io.to(reciver).emit("request", newPermission);
       })
