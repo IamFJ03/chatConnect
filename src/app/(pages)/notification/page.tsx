@@ -12,6 +12,12 @@ export default function Notification() {
             const res = await fetch(`/api/connection/notification?s=${encodeURIComponent(user.id.toString())}`, {
                 method: "GET",
             })
+
+            if(!res.ok) throw new Error("Error while fetching notifications");
+
+            const data = await res.json();
+            console.log(data?.message);
+            console.log(data?.notifications);
         }
         fetchNotifications();
     }, [])
