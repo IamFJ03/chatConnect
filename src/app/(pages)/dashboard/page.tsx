@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { io, Socket } from "socket.io-client";
 import { X } from "lucide-react";
+import Link from "next/link";
 
 let socket: Socket;
 
@@ -87,6 +88,7 @@ export default function Dashboard() {
   return (
     <div>
       <h2>Dashboard Page</h2>
+      <Link href={"/notification"}>Notifications</Link>
       <div className="m-10">
         <p className="mb-5">Search User</p>
 

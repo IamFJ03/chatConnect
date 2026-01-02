@@ -45,7 +45,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           }
           
           const sender = setPermissionDB?.rows[0];
-          if(reciever && setPermissionDB) 
+          if(reciever && setPermissionDB)   
             io.to(reciever).emit("request", sender);
       })
       
