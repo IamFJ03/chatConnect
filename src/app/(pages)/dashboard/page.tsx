@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
-import { io, Socket } from "socket.io-client";
+import { useSocket } from "@/app/context/socketContext";
+
 import { X } from "lucide-react";
 import Link from "next/link";
 
-let socket: Socket;
+
 
 type SearchedUser = {
   id: number,
@@ -22,6 +23,7 @@ type permissionInfo = {
 }
 
 export default function Dashboard() {
+  const {socket} = useSocket();
   const { user } = useAuth();
   const [permissionModal, setPermissionModal] = useState(false);
   const [modalInfo, setModalInfo] = useState<permissionInfo | null>(null);
@@ -32,25 +34,16 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    socket = io("/", {
-      path: "/api/socket"
-    });
     console.log("User data", user);
-
-    socket.on("connect", () => {
-      console.log("Connected with ID:", socket.id);
-      socket.emit("userRegister", { user });
-    });
-
-    socket.on("request", (data) => {
+    
+    socket?.on("request", (data) => {
       console.log("Request Receivd From:", data.sender, data);
       setNotificationModal(true);
       setModalInfo(data);
     })
 
     return () => {
-      socket.off("request");
-      socket.disconnect();
+      socket?.off("request");
     };
   }, [user]);
 
@@ -81,7 +74,7 @@ export default function Dashboard() {
 
     console.log("Permission Request:", newPermission);
 
-    socket.emit("permissionRequest", newPermission);
+    socket?.emit("permissionRequest", newPermission);
     setPermissionModal(false);
   }
 

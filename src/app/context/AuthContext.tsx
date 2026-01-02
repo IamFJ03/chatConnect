@@ -1,5 +1,4 @@
 "use client"
-
 import react, { useState, createContext, useContext, ReactNode } from 'react';
 
 type User = {
