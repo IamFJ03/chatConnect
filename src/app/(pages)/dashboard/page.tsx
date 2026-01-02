@@ -74,13 +74,14 @@ export default function Dashboard() {
     const newPermission = {
       senderId: user?.id,
       sender: user?.username,
-      receiverId: searchedUser?.id,
-      receiver: searchedUser?.username
+      recieverId: searchedUser?.id,
+      reciever: searchedUser?.username
     }
 
     console.log("Permission Request:", newPermission);
 
     socket.emit("permissionRequest", newPermission);
+    setPermissionModal(false);
   }
 
   return (

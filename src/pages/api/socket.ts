@@ -34,12 +34,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           if(searched.rows.length>0) console.log("User Found")
       })
 
-      socket.on("permissionRequest", (newPermission) => {
+      socket.on("permissionRequest", async (newPermission) => {
           console.log("Server Triggered... got data...", newPermission);
-          const reciver = UserMapping.get(newPermission.receiverId);
+          const reciever = UserMapping.get(newPermission.recieverId);
+          const checkPermission = await pool.query(`select * from "MessagePermission" where ("senderId" = $1 and "recieverId" = $2) or ("recieverId" = $1 and "senderId" = $2)`,[newPermission.senderId, newPermission.recieverId]);
+          let setPermissionDB;
+          if(checkPermission.rows.length>0) console.log("Permission Already sent");
+          if(checkPermission.rows.length === 0){
+             setPermissionDB = await pool.query(`insert into "MessagePermission"("senderId", sender, "recieverId", reciever) values($1, $2, $3, $4)`, [newPermission.senderId, newPermission.sender, newPermission.recieverId, newPermission.reciever]);
+          }
           
-          if(reciver) 
-            io.to(reciver).emit("request", newPermission);
+          const sender = setPermissionDB?.rows[0];
+          if(reciever && setPermissionDB) 
+            io.to(reciever).emit("request", sender);
       })
       
       socket.on("disconnect", () => {
