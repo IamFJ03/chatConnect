@@ -98,7 +98,7 @@ export default function Dashboard() {
             {searchedUser?.username}
           </div>}
       </div>
-      <div className="w-[60%] h-140 border border-gray-600 rounded-2xl">
+      <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
         <ChatScreen />
       </div>
       </div>
