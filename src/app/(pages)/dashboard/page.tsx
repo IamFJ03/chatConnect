@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSocket } from "@/app/context/socketContext";
+import ChatScreen from "@/app/components/chatScreen";
 
 import { X } from "lucide-react";
 import Link from "next/link";
@@ -23,7 +24,7 @@ type permissionInfo = {
 }
 
 export default function Dashboard() {
-  const {socket} = useSocket();
+  const { socket } = useSocket();
   const { user } = useAuth();
   const [permissionModal, setPermissionModal] = useState(false);
   const [modalInfo, setModalInfo] = useState<permissionInfo | null>(null);
@@ -35,7 +36,7 @@ export default function Dashboard() {
     if (!user) return;
 
     console.log("User data", user);
-    
+
     socket?.emit("userRegister", user)
 
     socket?.on("request", (data) => {
@@ -82,16 +83,24 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2>Dashboard Page</h2>
-      <Link href={"/notification"}>Notifications</Link>
-      <div className="m-10">
-        <p className="mb-5">Search User</p>
+      <div className="flex items-center m-10 justify-between">
+        <p className="text-2xl">Dashboard Page</p>
+        <Link href={"/notification"} className="text-xl">Notifications</Link>
+      </div>
+
+      <div className="flex items-center">
+        <div className="mx-10 border border-gray-600 md:h-140 md:w-[29%] md:p-10 py-10 px-3 rounded-2xl">
+        <p className="mb-5 text-xl">Search User</p>
 
         <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
         {searchedUser &&
           <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setPermissionModal(true)}>
             {searchedUser?.username}
           </div>}
+      </div>
+      <div className="w-[60%] h-140 border border-gray-600 rounded-2xl">
+        <ChatScreen />
+      </div>
       </div>
       <div className={`fixed inset-0 ${notificationModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
         <div className="md:w-70 w-[80%] ml-[10%] mt-[25%] md:h-70 bg-gray-800 rounded-2xl md:ml-[40%] md:mt-[10%]">
