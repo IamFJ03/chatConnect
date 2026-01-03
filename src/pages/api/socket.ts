@@ -40,12 +40,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           const checkPermission = await pool.query(`select * from "MessagePermission" where ("senderId" = $1 and "recieverId" = $2) or ("recieverId" = $1 and "senderId" = $2)`,[newPermission.senderId, newPermission.recieverId]);
           console.log(checkPermission.rows.length);
           let setPermissionDB;
-          if(checkPermission.rows.length>0) console.log("Permission Already sent");
-          if(checkPermission.rows.length === 0){
+          if(checkPermission.rows.length>0){
+            if(checkPermission.rows[0].status === "accepted") 
+              console.log("Has Been Accepted");
+          }
+            
+          else if(checkPermission.rows.length === 0){
              setPermissionDB = await pool.query(`insert into "MessagePermission"("senderId", sender, "recieverId", reciever) values($1, $2, $3, $4) returning *`, [newPermission.senderId, newPermission.sender, newPermission.recieverId, newPermission.reciever]);
              console.log(checkPermission);
              console.log(checkPermission.rows[0]);
           }
+          
           
           const sender = setPermissionDB?.rows[0];
           console.log(sender);
