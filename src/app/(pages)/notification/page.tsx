@@ -1,10 +1,18 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useAuth } from "@/app/context/AuthContext"
+
+type notificationType = [{
+    id: number,
+    sender: string,
+    reciever: string,
+    status: string
+}]
 
 export default function Notification() {
     const { user } = useAuth();
+    const[notifications, setNotifications] = useState<notificationType | null>(null)
     useEffect(() => {
         if(!user) return;
 
@@ -17,7 +25,8 @@ export default function Notification() {
 
             const data = await res.json();
             console.log(data?.message);
-            console.log(data?.notifications);
+            console.log(data?.notification);
+            setNotifications(data?.notification)
         }
         fetchNotifications();
     }, [])
@@ -25,8 +34,13 @@ export default function Notification() {
     return (
         <div>
             <h2>Notification Page</h2>
-            <p>{user?.username}</p>
-            <p>{user?.id}</p>
+
+            {notifications?.map((item) => (
+                <div key={item.id.toString()} className="bg-gray-800 w-[90%] py-2 px-5 rounded ml-[5%] mt-10">
+                    <p>Sender:{item.sender}</p>
+                    <p>You: {item.reciever}</p>
+                </div>
+            ))}
         </div>
     )
 }

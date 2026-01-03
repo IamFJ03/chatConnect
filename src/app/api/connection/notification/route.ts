@@ -9,10 +9,8 @@ export async function GET(req: NextRequest){
         return Response.json({message:"User Id Required"},{status:400});
     
     const fetchDetails = await pool.query(`select * from "MessagePermission" where "recieverId" = $1`,[query]);
-    if(fetchDetails.rows.length === 0) return Response.json({message:"No New Notifications"},{status:400});
+    if(fetchDetails.rows.length === 0) return Response.json({message:"No New Notifications"},{status:200});
 
     console.log("Notification:", fetchDetails);
-    return Response.json({message:"Notifications found", notifications:fetchDetails},{status:200})
-
-    
+    return Response.json({message:"Notifications found", notification:fetchDetails.rows},{status:200})
 }
