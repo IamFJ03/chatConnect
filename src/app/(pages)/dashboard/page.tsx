@@ -36,8 +36,10 @@ export default function Dashboard() {
 
     console.log("User data", user);
     
+    socket?.emit("userRegister", user)
+
     socket?.on("request", (data) => {
-      console.log("Request Receivd From:", data.sender, data);
+      console.log("Request Recieved From:", data.sender, data);
       setNotificationModal(true);
       setModalInfo(data);
     })

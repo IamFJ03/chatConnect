@@ -1,27 +1,28 @@
 "use client"
 
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext"
 
-type notificationType = [{
+type notificationType = {
     id: number,
     sender: string,
     reciever: string,
     status: string
-}]
+}[]
 
 export default function Notification() {
     const { user } = useAuth();
-    const[notifications, setNotifications] = useState<notificationType | null>(null)
+    const [isAccepted, setIsAccepted] = useState(false);
+    const [notifications, setNotifications] = useState<notificationType>([])
     useEffect(() => {
-        if(!user) return;
+        if (!user) return;
 
         const fetchNotifications = async () => {
             const res = await fetch(`/api/connection/notification?s=${encodeURIComponent(user.id.toString())}`, {
                 method: "GET",
             })
 
-            if(!res.ok) throw new Error("Error while fetching notifications");
+            if (!res.ok) throw new Error("Error while fetching notifications");
 
             const data = await res.json();
             console.log(data?.message);
@@ -29,18 +30,42 @@ export default function Notification() {
             setNotifications(data?.notification)
         }
         fetchNotifications();
-    }, [])
+    }, [user])
+
+    const handleStatus = async (updateId: number, status: string) => {
+        const res = await fetch("/api/connection/status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: updateId, status: status })
+        });
+
+        if(!res.ok) throw new Error("Some Error");
+
+        const data = await res.json();
+        if(data?.message === "Request Deleted" || data?.message==="Update Succesfull")
+            setNotifications(prev => prev?.filter((item) => item.id!==data.newNotifications.id))
+        console.log(data?.message);
+        console.log(data?.newNotifications);
+    }
 
     return (
         <div>
-            <h2>Notification Page</h2>
+            <h2 className="mt-10 ml-10 text-2xl">Notification Page</h2>
+            <div className="mt-10 flex flex-col gap-5">
+                {notifications?.map((item) => (
+                    <div key={item.id.toString()} className="bg-gray-800 w-[90%] md:w-100 py-2 md:py-5 px-5 rounded ml-[5%] flex flex-col gap-5">
+                        <p>Sender:{item.sender}</p>
+                        <p>You: {item.reciever}</p>
 
-            {notifications?.map((item) => (
-                <div key={item.id.toString()} className="bg-gray-800 w-[90%] py-2 px-5 rounded ml-[5%] mt-10">
-                    <p>Sender:{item.sender}</p>
-                    <p>You: {item.reciever}</p>
-                </div>
-            ))}
+                        <div>
+                            <button className="bg-gray-900 py-1.5 px-3 cursor-pointer hover:scale-110 transition-all duration-500 rounded shadow shadow-white" onClick={() => handleStatus(item.id, "accept")}>Accept</button>
+                            <button className="bg-gray-900 py-1.5 px-3 ml-5 cursor-pointer hover:scale-110 transition-all duration-500 rounded shadow shadow-white" onClick={() => handleStatus(item.id, "reject")}>Reject</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
