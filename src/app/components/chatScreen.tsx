@@ -1,3 +1,6 @@
+"use client"
+import { useSocket } from "../context/socketContext";
+import { useState } from "react";
 type chatUserProps = {
     chatUser: {
         id: number,
@@ -7,6 +10,19 @@ type chatUserProps = {
 }
 
 export default function ChatScreen({ chatUser }: chatUserProps) {
+    const {socket} = useSocket();
+    const[msg, setMsg] = useState("");
+
+    const handleSend = async () => {
+        const sendingData = {
+            id: chatUser?.id,
+            username: chatUser.username,
+            email: chatUser.email,
+            message: msg
+        }
+        socket?.emit("sendMessage", sendingData);
+    }
+
     return (
 
         <div className="flex flex-col w-full">
@@ -20,8 +36,8 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
 
                     </div>
                     <div className="flex w-full">
-                        <input type="text" placeholder="Type Message..." className="border border-gray-600 px-3 py-1.5 rounded-t-xl flex-1" />
-                        <button className="bg-gray-800 py-1.5 px-3 rounded cursor-pointer">Send</button>
+                        <input type="text" value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Type Message..." className="border border-gray-600 px-3 py-1.5 rounded-t-xl flex-1" />
+                        <button className="bg-gray-800 py-1.5 px-3 rounded cursor-pointer" onClick={handleSend}>Send</button>
                     </div></>
                 :
                 <>

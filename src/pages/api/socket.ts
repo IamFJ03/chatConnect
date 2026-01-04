@@ -59,6 +59,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
         if (reciever && setPermissionDB)
           io.to(reciever).emit("request", sender);
       })
+ 
+      socket.on("sendMessage", (data) => {
+        const reciever = UserMapping.get(data.id);
+        console.log("Recieved data at backend", data);
+        console.log("sender Id:", socket.id, "reciever Id:", reciever);
+        if(reciever)
+          io.to(reciever).emit("recieveMessage", data);
+      })
 
       socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);
