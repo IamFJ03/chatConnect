@@ -9,15 +9,27 @@ type chatUserProps = {
     }
 }
 
+type messageListType = {
+    id: number,
+    message: string
+}
+
 export default function ChatScreen({ chatUser }: chatUserProps) {
     const {socket} = useSocket();
     const[msg, setMsg] = useState("");
+    const[messageList, setMessageList] = useState<messageListType[]>([]);
 
     useEffect(() => {
-      if(socket)
+      if(!socket) return;
+
         socket?.on("recieveMessage", (receivedMessage) => {
             console.log("Message Recieved", receivedMessage.message);
+            setMessageList(prev => [...prev, {id: receivedMessage.id ,message:receivedMessage.message}]);
         })
+
+        return () => {
+            socket.off("recieveMessage");
+        }
     },[])
 
     const handleSend = async () => {
@@ -27,6 +39,7 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
             email: chatUser.email,
             message: msg
         }
+        setMessageList(prev => [...prev,{id: chatUser.id,message: msg}])
         socket?.emit("sendMessage", sendingData);
         setMsg("");
     }
@@ -37,11 +50,18 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
             {chatUser ?
                 <>
                     <div className="flex-1">
-
                         <div className="bg-gray-600 rounded-t-2xl px-10 py-5">
                             <p>{chatUser.username}</p>
                         </div>
-
+                    </div>
+                    <div className="flex flex-col p-5 ">
+                    {
+                        messageList.map((msg, index) => (
+                            <div key={index} className={`flex px-5 py-2 mt-5  ${chatUser.id === msg.id ? 'bg-gray-600   self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
+                                <p>{msg.message}</p>
+                            </div>
+                        ))
+                    }
                     </div>
                     <div className="flex w-full">
                         <input type="text" value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Type Message..." className="border border-gray-600 px-3 py-1.5 rounded-t-xl flex-1" />
