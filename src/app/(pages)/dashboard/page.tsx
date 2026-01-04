@@ -4,11 +4,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSocket } from "@/app/context/socketContext";
 import ChatScreen from "@/app/components/chatScreen";
-
 import { X } from "lucide-react";
 import Link from "next/link";
-
-
 
 type SearchedUser = {
   id: number,
@@ -26,6 +23,7 @@ type permissionInfo = {
 export default function Dashboard() {
   const { socket } = useSocket();
   const { user } = useAuth();
+  const[chatUser, setChatUser] = useState<SearchedUser | null>(null);
   const [permissionModal, setPermissionModal] = useState(false);
   const [modalInfo, setModalInfo] = useState<permissionInfo | null>(null);
   const [notificationModal, setNotificationModal] = useState(false);
@@ -82,6 +80,7 @@ export default function Dashboard() {
           setPermissionModal(true)
       }
       console.log("Message Has been accepted")
+      setChatUser(searchedUser);
     }
     catch (error) {
       console.error("Search error:", error);
@@ -124,7 +123,7 @@ export default function Dashboard() {
             </div>}
         </div>
         <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
-          <ChatScreen />
+          <ChatScreen chatUser={chatUser!}/>
         </div>
       </div>
       <div className={`fixed inset-0 ${notificationModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
