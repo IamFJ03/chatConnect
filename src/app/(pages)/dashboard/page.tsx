@@ -41,8 +41,10 @@ export default function Dashboard() {
 
     socket?.on("request", (data) => {
       console.log("Request Recieved From:", data.sender, data);
+
       setNotificationModal(true);
       setModalInfo(data);
+
     })
 
     return () => {
@@ -67,6 +69,25 @@ export default function Dashboard() {
     }
   }
 
+  const handleStatus = async () => {
+    try {
+      if (searchedUser) {
+        const res = await fetch(`/api/connection/status?s=${encodeURIComponent(searchedUser.id.toString())}`, {
+          method: "GET"
+        });
+      
+        if(!res.ok) throw new Error("Not Found");
+        const data = await res.json();
+        if(data?.message === "Message not been sent or accepted")
+          setPermissionModal(true)
+      }
+      console.log("Message Has been accepted")
+    }
+    catch (error) {
+      console.error("Search error:", error);
+    }
+  }
+
   const handlePermission = () => {
     const newPermission = {
       senderId: user?.id,
@@ -85,22 +106,26 @@ export default function Dashboard() {
     <div>
       <div className="flex items-center m-10 justify-between">
         <p className="text-2xl">Dashboard Page</p>
-        <Link href={"/notification"} className="text-xl">Notifications</Link>
+        <div className="flex gap-5">
+          <Link href={"/notification"} className="text-xl">Notifications</Link>
+          <Link href={"/contacts"} className="text-xl">Contacts</Link>
+        </div>
+
       </div>
 
       <div className="flex items-center">
         <div className="mx-10 border border-gray-600 md:h-140 md:w-[29%] md:p-10 py-10 px-3 rounded-2xl">
-        <p className="mb-5 text-xl">Search User</p>
+          <p className="mb-5 text-xl">Search User</p>
 
-        <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
-        {searchedUser &&
-          <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setPermissionModal(true)}>
-            {searchedUser?.username}
-          </div>}
-      </div>
-      <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
-        <ChatScreen />
-      </div>
+          <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
+          {searchedUser &&
+            <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => handleStatus()}>
+              {searchedUser?.username}
+            </div>}
+        </div>
+        <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
+          <ChatScreen />
+        </div>
       </div>
       <div className={`fixed inset-0 ${notificationModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
         <div className="md:w-70 w-[80%] ml-[10%] mt-[25%] md:h-70 bg-gray-800 rounded-2xl md:ml-[40%] md:mt-[10%]">
