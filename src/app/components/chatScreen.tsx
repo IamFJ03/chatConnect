@@ -1,6 +1,6 @@
 "use client"
 import { useSocket } from "../context/socketContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 type chatUserProps = {
     chatUser: {
         id: number,
@@ -13,6 +13,13 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
     const {socket} = useSocket();
     const[msg, setMsg] = useState("");
 
+    useEffect(() => {
+      if(socket)
+        socket?.on("recieveMessage", (receivedMessage) => {
+            console.log("Message Recieved", receivedMessage.message);
+        })
+    },[])
+
     const handleSend = async () => {
         const sendingData = {
             id: chatUser?.id,
@@ -21,6 +28,7 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
             message: msg
         }
         socket?.emit("sendMessage", sendingData);
+        setMsg("");
     }
 
     return (
