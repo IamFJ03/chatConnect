@@ -11,8 +11,9 @@ type chatUserProps = {
 }
 
 type messageListType = {
-    id: number,
-    message: string
+    senderId: number,
+    text: string,
+    createdAt: string;
 }
 
 export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
@@ -21,17 +22,29 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
     const[messageList, setMessageList] = useState<messageListType[]>([]);
 
     useEffect(() => {
-      if(!socket) return;
-
+      if(!socket && !chatUser?.id) return;
+      
+        const fetchingInfo = {
+            senderId: currentUserId,
+            recieverId: chatUser?.id
+        }
+        socket?.emit("fetchMessages", fetchingInfo);
+        socket?.on("sendingFetchedData", (data) => {
+            const parsedMessage = data?.messages.map((m:string) => typeof m === "string" ? JSON.parse(m) : m)
+            console.log(parsedMessage)
+            setMessageList(parsedMessage)
+        })
+    
         socket?.on("recieveMessage", (receivedMessage) => {
             console.log("Message Recieved", receivedMessage.message);
-            setMessageList(prev => [...prev, {id: receivedMessage.senderId ,message:receivedMessage.message}]);
+            setMessageList(prev => [...prev, {senderId: receivedMessage.senderId ,text:receivedMessage.message, createdAt: new Date().toISOString()}]);
         })
 
         return () => {
-            socket.off("recieveMessage");
+            socket?.off("recieveMessage");
+            socket?.off("sendinFetchedData");
         }
-    },[])
+    },[chatUser?.id])
 
     const handleSend = async () => {
         const sendingData = {
@@ -41,7 +54,7 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
             email: chatUser.email,
             message: msg
         }
-        setMessageList(prev => [...prev,{id: currentUserId, message: msg}])
+        setMessageList(prev => [...prev,{senderId: currentUserId, text: msg, createdAt: new Date().toISOString()}])
         socket?.emit("sendMessage", sendingData);
         setMsg("");
     }
@@ -58,9 +71,9 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
                     </div>
                     <div className="flex flex-col p-5 max-h-[80%] overflow-auto">
                     {
-                        messageList.map((msg, index) => (
-                            <div key={index} className={`flex px-5 py-2 mt-5  ${currentUserId === msg.id ? 'bg-gray-600 self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
-                                <p>{msg.message}</p>
+                        messageList?.map((msg, index) => (
+                            <div key={index} className={`flex px-5 py-2 mt-5  ${currentUserId === msg.senderId ? 'bg-gray-600 self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
+                                <p>{msg.text}</p>
                             </div>
                         ))
                     }

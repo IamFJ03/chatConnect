@@ -59,19 +59,40 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
         if (reciever && setPermissionDB)
           io.to(reciever).emit("request", sender);
       })
- 
+
+      socket.on("fetchMessages", async (info) => {
+        console.log(info, "at backend");
+        const fetched = await pool.query(`select * from "Messages" where ("senderId"=$1 and "recieverId"=$2) or ("recieverId"=$1 and "senderId"=$2)`, [info.senderId, info.recieverId]);
+        if (fetched.rows.length === 0) console.log("No User Exists");
+
+        const fetchedData = fetched.rows[0];
+        console.log(fetchedData, "at Backed");
+        socket.emit("sendingFetchedData", fetchedData);
+      })
+
       socket.on("sendMessage", async (data) => {
         const reciever = UserMapping.get(data.recieverId);
         console.log("Recieved data at backend", data);
         console.log("sender Id:", data.id, "reciever Id:", data.recieverId);
-        const checkUsers = await pool.query(`select * from "Messages" where ("senderId"=$1 and "recieverId"=$2) or ("recieverId"=$1 and "senderId"=$2)`,[data.id, data.recieverId]);
+        const checkUsers = await pool.query(`select * from "Messages" where ("senderId"=$1 and "recieverId"=$2) or ("recieverId"=$1 and "senderId"=$2)`, [data.id, data.recieverId]);
         let newMsg;
-        if(checkUsers.rows.length>0){
-          await pool.query(`update "Messages" Set messages = array_append(messages, $1) where id = $2 returning *`, [data.message, checkUsers.rows[0].id]);
+        if (checkUsers.rows.length > 0) {
+          await pool.query(`
+  UPDATE "Messages"
+  SET messages = array_append(
+    messages,
+    jsonb_build_object(
+      'senderId', $1,
+      'text', $2,
+      'createdAt', now()
+    )::text
+  )
+  WHERE id = $3
+`, [data.id, data.message, checkUsers.rows[0].id]);
           console.log("Message inserted in database")
         }
-        else{
-          await pool.query(`insert into "Messages"("senderId", "recieverId", messages) values($1, $2, Array[$3]) returning *`,[data.id, data.recieverId, data.message]);
+        else {
+          await pool.query(`insert into "Messages"("senderId", "recieverId", messages) values($1, $2, Array[jsonb_build_object('senderId', $1::text, 'text', $3::text, 'createdAt', now())]) returning *`, [data.id, data.recieverId, data.message]);
           console.log("Message inserted in database")
         }
 
@@ -81,7 +102,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           message: data.message
         }
         console.log(updatedConversation);
-        if(reciever)
+        if (reciever)
           io.to(reciever).emit("recieveMessage", updatedConversation);
       })
 
