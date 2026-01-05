@@ -6,7 +6,8 @@ type chatUserProps = {
         id: number,
         username: string,
         email: string
-    }
+    },
+    currentUserId: number
 }
 
 type messageListType = {
@@ -14,7 +15,7 @@ type messageListType = {
     message: string
 }
 
-export default function ChatScreen({ chatUser }: chatUserProps) {
+export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
     const {socket} = useSocket();
     const[msg, setMsg] = useState("");
     const[messageList, setMessageList] = useState<messageListType[]>([]);
@@ -34,12 +35,13 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
 
     const handleSend = async () => {
         const sendingData = {
-            id: chatUser?.id,
+            id: currentUserId,
+            recieverId: chatUser.id,
             username: chatUser.username,
             email: chatUser.email,
             message: msg
         }
-        setMessageList(prev => [...prev,{id: chatUser.id,message: msg}])
+        setMessageList(prev => [...prev,{id: currentUserId, message: msg}])
         socket?.emit("sendMessage", sendingData);
         setMsg("");
     }
@@ -57,7 +59,7 @@ export default function ChatScreen({ chatUser }: chatUserProps) {
                     <div className="flex flex-col p-5 ">
                     {
                         messageList.map((msg, index) => (
-                            <div key={index} className={`flex px-5 py-2 mt-5  ${chatUser.id === msg.id ? 'bg-gray-600   self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
+                            <div key={index} className={`flex px-5 py-2 mt-5  ${currentUserId === msg.id ? 'bg-gray-600 self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
                                 <p>{msg.message}</p>
                             </div>
                         ))

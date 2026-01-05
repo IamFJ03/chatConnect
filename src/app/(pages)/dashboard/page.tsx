@@ -123,7 +123,7 @@ export default function Dashboard() {
             </div>}
         </div>
         <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
-          <ChatScreen chatUser={chatUser!}/>
+          <ChatScreen chatUser={chatUser!} currentUserId={user?.id!}/>
         </div>
       </div>
       <div className={`fixed inset-0 ${notificationModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>

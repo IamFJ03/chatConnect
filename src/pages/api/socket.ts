@@ -61,9 +61,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
       })
  
       socket.on("sendMessage", (data) => {
-        const reciever = UserMapping.get(data.id);
+        const reciever = UserMapping.get(data.recieverId);
         console.log("Recieved data at backend", data);
-        console.log("sender Id:", socket.id, "reciever Id:", reciever);
+        console.log("sender Id:", data.id, "reciever Id:", data.recieverId);
         if(reciever)
           io.to(reciever).emit("recieveMessage", data);
       })
