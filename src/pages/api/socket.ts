@@ -60,12 +60,25 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
           io.to(reciever).emit("request", sender);
       })
  
-      socket.on("sendMessage", (data) => {
+      socket.on("sendMessage", async (data) => {
         const reciever = UserMapping.get(data.recieverId);
         console.log("Recieved data at backend", data);
         console.log("sender Id:", data.id, "reciever Id:", data.recieverId);
+        const checkUsers = await pool.query(`select * from "Messages" where ("senderId"=$1 and "recieverId"=$2) or ("recieverId"=$1 and "senderId"=$2)`,[data.id, data.recieverId]);
+        let newMsg;
+        if(checkUsers.rows.length>0){
+          newMsg = await pool.query(`update "Messages" Set messages = array_append(messages, $1) where id = $2 returning *`, [data.message, checkUsers.rows[0].id]);
+          console.log("Message inserted in database")
+        }
+        else{
+          newMsg = await pool.query(`insert into "Messages"("senderId", "recieverId", messages) values($1, $2, Array[$3]) returning *`,[data.id, data.recieverId, data.message]);
+          console.log("Message inserted in database")
+        }
+
+        const updatedConversation = newMsg.rows[0];
+        console.log(updatedConversation);
         if(reciever)
-          io.to(reciever).emit("recieveMessage", data);
+          io.to(reciever).emit("recieveMessage", updatedConversation);
       })
 
       socket.on("disconnect", () => {

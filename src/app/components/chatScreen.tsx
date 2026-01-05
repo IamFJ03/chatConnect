@@ -25,7 +25,7 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
 
         socket?.on("recieveMessage", (receivedMessage) => {
             console.log("Message Recieved", receivedMessage.message);
-            setMessageList(prev => [...prev, {id: receivedMessage.id ,message:receivedMessage.message}]);
+            setMessageList(prev => [...prev, {id: receivedMessage.senderId ,message:receivedMessage.message}]);
         })
 
         return () => {
@@ -56,7 +56,7 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
                             <p>{chatUser.username}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col p-5 ">
+                    <div className="flex flex-col p-5 max-h-[80%] overflow-auto">
                     {
                         messageList.map((msg, index) => (
                             <div key={index} className={`flex px-5 py-2 mt-5  ${currentUserId === msg.id ? 'bg-gray-600 self-end rounded' : 'bg-gray-800 w-fit rounded'}`}>
