@@ -67,15 +67,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
         const checkUsers = await pool.query(`select * from "Messages" where ("senderId"=$1 and "recieverId"=$2) or ("recieverId"=$1 and "senderId"=$2)`,[data.id, data.recieverId]);
         let newMsg;
         if(checkUsers.rows.length>0){
-          newMsg = await pool.query(`update "Messages" Set messages = array_append(messages, $1) where id = $2 returning *`, [data.message, checkUsers.rows[0].id]);
+          await pool.query(`update "Messages" Set messages = array_append(messages, $1) where id = $2 returning *`, [data.message, checkUsers.rows[0].id]);
           console.log("Message inserted in database")
         }
         else{
-          newMsg = await pool.query(`insert into "Messages"("senderId", "recieverId", messages) values($1, $2, Array[$3]) returning *`,[data.id, data.recieverId, data.message]);
+          await pool.query(`insert into "Messages"("senderId", "recieverId", messages) values($1, $2, Array[$3]) returning *`,[data.id, data.recieverId, data.message]);
           console.log("Message inserted in database")
         }
 
-        const updatedConversation = newMsg.rows[0];
+        const updatedConversation = {
+          senderId: data.id,
+          recieverId: data.recieverId,
+          message: data.message
+        }
         console.log(updatedConversation);
         if(reciever)
           io.to(reciever).emit("recieveMessage", updatedConversation);
