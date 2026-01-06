@@ -16,8 +16,8 @@ type SearchedUser = {
 type permissionInfo = {
   senderId: number,
   sender: string,
-  receiverId: number,
-  receiver: string
+  recieverId: number,
+  reciever: string
 }
 
 export default function Dashboard() {
@@ -70,14 +70,16 @@ export default function Dashboard() {
   const handleStatus = async () => {
     try {
       if (searchedUser) {
-        const res = await fetch(`/api/connection/status?s=${encodeURIComponent(searchedUser.id.toString())}`, {
+        const res = await fetch(`/api/connection/status?s=${encodeURIComponent(searchedUser.id.toString())}&senderId=${encodeURIComponent(user?.id.toString()!)}`, {
           method: "GET"
         });
       
         if(!res.ok) throw new Error("Not Found");
         const data = await res.json();
-        if(data?.message === "Message not been sent or accepted")
+        if(data?.message === "Message not been sent or accepted"){
           setPermissionModal(true)
+          return;
+        }
       }
       console.log("Message Has been accepted")
       setChatUser(searchedUser);
@@ -131,7 +133,7 @@ export default function Dashboard() {
           <X size={25} color="white" onClick={() => setPermissionModal(false)} className="relative md:left-60 left-75 top-3 cursor-pointer" />
           <div className="p-5 md:ml-7 ml-10 mt-3">
             <p className="md:w-50 w-55">Got a New Request from someone you might know...</p>
-            <p className="my-5">You:{modalInfo?.receiver}</p>
+            <p className="my-5">You:{modalInfo?.reciever}</p>
             <p className="mb-5">Reciver: {modalInfo?.sender}</p>
             <button className="bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setNotificationModal(false)}>Accept</button>
             <button className="ml-5 bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => {
