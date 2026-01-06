@@ -82,8 +82,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
   SET messages = array_append(
     messages,
     jsonb_build_object(
-      'senderId', $1,
-      'text', $2,
+      'senderId', $1::text,
+      'text', $2::text,
       'createdAt', now()
     )::text
   )
