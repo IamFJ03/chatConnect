@@ -37,12 +37,13 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
     
         socket?.on("recieveMessage", (receivedMessage) => {
             console.log("Message Recieved", receivedMessage.message);
+            
             setMessageList(prev => [...prev, {senderId: receivedMessage.senderId ,text:receivedMessage.message, createdAt: new Date().toISOString()}]);
         })
 
         return () => {
             socket?.off("recieveMessage");
-            socket?.off("sendinFetchedData");
+            socket?.off("sendingFetchedData");
         }
     },[chatUser?.id])
 

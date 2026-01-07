@@ -3,155 +3,42 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSocket } from "@/app/context/socketContext";
+import Navbar from "@/app/components/navbar";
 import ChatScreen from "@/app/components/chatScreen";
-import { X } from "lucide-react";
+import SearchBox from "@/app/components/searchBox";
+import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
 
-type SearchedUser = {
-  id: number,
-  username: string,
-  email: string
-}
 
-type permissionInfo = {
-  senderId: number,
-  sender: string,
-  recieverId: number,
-  reciever: string
-}
 
 export default function Dashboard() {
   const { socket } = useSocket();
   const { user } = useAuth();
-  const[chatUser, setChatUser] = useState<SearchedUser | null>(null);
-  const [permissionModal, setPermissionModal] = useState(false);
-  const [modalInfo, setModalInfo] = useState<permissionInfo | null>(null);
-  const [notificationModal, setNotificationModal] = useState(false);
-  const [searchedUser, setSearchedUser] = useState<SearchedUser | null>(null);
-  const [searchUser, setSearchUser] = useState("");
+  const { chatUser } = useUser();
 
   useEffect(() => {
     if (!user) return;
 
-    console.log("User data", user);
+    socket?.emit("userRegister", user);
 
-    socket?.emit("userRegister", user)
-
-    socket?.on("request", (data) => {
-      console.log("Request Recieved From:", data.sender, data);
-
-      setNotificationModal(true);
-      setModalInfo(data);
-
-    })
-
-    return () => {
-      socket?.off("request");
-    };
   }, [user]);
 
-  const handleSearchUser = async () => {
-    try {
-      const res = await fetch(`/api/connection/user?s=${encodeURIComponent(searchUser)}`, {
-        method: "GET",
-      });
-      if (!res.ok) throw new Error("failed to fetch User");
 
-      const data = await res.json();
-      setSearchUser("");
-      console.log(data?.data);
-      setSearchedUser(data?.data)
-    }
-    catch (error) {
-      console.error("Search error:", error);
-    }
-  }
-
-  const handleStatus = async () => {
-    try {
-      if (searchedUser) {
-        const res = await fetch(`/api/connection/status?s=${encodeURIComponent(searchedUser.id.toString())}&senderId=${encodeURIComponent(user?.id.toString()!)}`, {
-          method: "GET"
-        });
-      
-        if(!res.ok) throw new Error("Not Found");
-        const data = await res.json();
-        if(data?.message === "Message not been sent or accepted"){
-          setPermissionModal(true)
-          return;
-        }
-      }
-      console.log("Message Has been accepted")
-      setChatUser(searchedUser);
-    }
-    catch (error) {
-      console.error("Search error:", error);
-    }
-  }
-
-  const handlePermission = () => {
-    const newPermission = {
-      senderId: user?.id,
-      sender: user?.username,
-      recieverId: searchedUser?.id,
-      reciever: searchedUser?.username
-    }
-
-    console.log("Permission Request:", newPermission);
-
-    socket?.emit("permissionRequest", newPermission);
-    setPermissionModal(false);
-  }
 
   return (
-    <div>
-      <div className="flex items-center m-10 justify-between">
-        <p className="text-2xl">Dashboard Page</p>
-        <div className="flex gap-5">
-          <Link href={"/notification"} className="text-xl">Notifications</Link>
-          <Link href={"/contacts"} className="text-xl">Contacts</Link>
+    <div className="min-h-screen p-4 md:p-8">
+      <Navbar />
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-[30%] border border-gray-600 rounded-2xl p-5 md:p-8">
+          <p className="text-lg mb-4">Search User</p>
+          <SearchBox />
         </div>
 
-      </div>
-
-      <div className="flex items-center">
-        <div className="mx-10 border border-gray-600 md:h-140 md:w-[29%] md:p-10 py-10 px-3 rounded-2xl">
-          <p className="mb-5 text-xl">Search User</p>
-
-          <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search User..." className="border border-gray-600 py-1 px-3 md:w-65" /><button onClick={handleSearchUser} className="ml-5 bg-gray-800 py-1 px-3 rounded cursor-pointer">Search</button>
-          {searchedUser &&
-            <div className="mt-10 bg-gray-800 md:w-65 p-5 rounded shadow shadow-gray-400 cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => handleStatus()}>
-              {searchedUser?.username}
-            </div>}
-        </div>
-        <div className="w-[60%] h-140 border border-gray-600 rounded-2xl flex">
-          <ChatScreen chatUser={chatUser!} currentUserId={user?.id!}/>
-        </div>
-      </div>
-      <div className={`fixed inset-0 ${notificationModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
-        <div className="md:w-70 w-[80%] ml-[10%] mt-[25%] md:h-70 bg-gray-800 rounded-2xl md:ml-[40%] md:mt-[10%]">
-          <X size={25} color="white" onClick={() => setPermissionModal(false)} className="relative md:left-60 left-75 top-3 cursor-pointer" />
-          <div className="p-5 md:ml-7 ml-10 mt-3">
-            <p className="md:w-50 w-55">Got a New Request from someone you might know...</p>
-            <p className="my-5">You:{modalInfo?.reciever}</p>
-            <p className="mb-5">Reciver: {modalInfo?.sender}</p>
-            <button className="bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setNotificationModal(false)}>Accept</button>
-            <button className="ml-5 bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => {
-              setNotificationModal(false)
-            }}>Decline</button>
-          </div>
-        </div>
-      </div>
-      <div className={`fixed inset-0 ${permissionModal ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none opacity-0'} transition-all duration-500`}>
-        <div className="md:w-70 w-[80%] ml-[10%] mt-[25%] md:h-70 bg-gray-800 rounded-2xl md:ml-[40%] md:mt-[10%]">
-          <X size={25} color="white" onClick={() => setPermissionModal(false)} className="relative md:left-60 left-75 top-3 cursor-pointer" />
-          <div className="p-5 md:ml-7 ml-10 mt-3">
-            <p className="md:w-50 w-55">Request For Permission and start having chat...</p>
-            <p className="my-5">Username:{user?.username}</p>
-            <p className="mb-5">Reciver: {searchedUser?.username}</p>
-            <button className="bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={() => setPermissionModal(false)}>Cancel</button>
-            <button className="ml-5 bg-gray-900 py-1.5 px-3 rounded cursor-pointer hover:scale-105 transition-all duration-500" onClick={handlePermission}>Send</button>
-          </div>
+        <div className="w-full md:w-[70%] h-[65vh] md:h-[80vh] border border-gray-600 rounded-2xl flex">
+          <ChatScreen
+            chatUser={chatUser!}
+            currentUserId={user?.id!}
+          />
         </div>
       </div>
     </div>

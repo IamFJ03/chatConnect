@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/app/context/AuthContext"
+import { useAuth } from "@/app/context/AuthContext";
+import Navbar from "@/app/components/navbar";
 
 type notificationType = {
     id: number,
@@ -12,7 +13,6 @@ type notificationType = {
 
 export default function Notification() {
     const { user } = useAuth();
-    const [isAccepted, setIsAccepted] = useState(false);
     const [notifications, setNotifications] = useState<notificationType>([])
     useEffect(() => {
         if (!user) return;
@@ -51,10 +51,14 @@ export default function Notification() {
     }
 
     return (
-        <div>
-            <h2 className="mt-10 ml-10 text-2xl">Notification Page</h2>
-            <div className="mt-10 flex flex-col gap-5">
-                {notifications?.map((item) => (
+        <div className="min-h-screen p-4 md:p-8">
+            <Navbar />
+            <h2 className="mt-10 text-2xl">Notifications:</h2>
+            <div className="mt-10 flex flex-col gap-5 border border-gray-600 p-5 rounded">
+                {
+                    notifications
+                    ?
+                    notifications?.map((item) => (
                     <div key={item.id.toString()} className="bg-gray-800 w-[90%] md:w-100 py-2 md:py-5 px-5 rounded ml-[5%] flex flex-col gap-5">
                         <p>Sender:{item.sender}</p>
                         <p>You: {item.reciever}</p>
@@ -64,7 +68,12 @@ export default function Notification() {
                             <button className="bg-gray-900 py-1.5 px-3 ml-5 cursor-pointer hover:scale-110 transition-all duration-500 rounded shadow shadow-white" onClick={() => handleStatus(item.id, "reject")}>Reject</button>
                         </div>
                     </div>
-                ))}
+                ))
+                :
+                <div>
+                    <p className="text-gray-400 text-lg">No new Notifications...</p>
+                </div>
+                }
             </div>
         </div>
     )
