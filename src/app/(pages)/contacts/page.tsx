@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "@/app/components/navbar"
-
+import { useAuth } from "@/app/context/AuthContext"
 type ContactType = {
     id: number,
     reciever: string,
@@ -10,7 +10,26 @@ type ContactType = {
 }[]
 
 export default function Contacts() {
-    const[contacts, setContacts] = useState<ContactType>([])
+    const { user } = useAuth();
+    useEffect(() => {
+        const fetchContacts = async () => {
+            try {
+                const res = await fetch(`/api/connection/contacts?c=${user?.id}`, {
+                    method: "GET"
+                });
+
+                if(!res.ok)
+                    console.log()
+            }
+            catch (err) {
+                console.log("Error", err)
+            }
+        }
+
+        fetchContacts();
+    },[user]);
+
+    const [contacts, setContacts] = useState<ContactType>([])
     return (
         <div className="min-h-screen p-4 md:p-8">
             <Navbar />
@@ -18,17 +37,17 @@ export default function Contacts() {
             <div className="mt-10 flex flex-col gap-5 border border-gray-600 p-5 rounded">
                 {
                     contacts
-                    ?
-                    contacts?.map((item) => (
-                    <div key={item.id.toString()} className="bg-gray-800 w-[90%] md:w-100 py-2 md:py-5 px-5 rounded ml-[5%] flex flex-col gap-5">
-                        <p>{item.reciever}</p>
+                        ?
+                        contacts?.map((item) => (
+                            <div key={item.id.toString()} className="bg-gray-800 w-[90%] md:w-100 py-2 md:py-5 px-5 rounded ml-[5%] flex flex-col gap-5">
+                                <p>{item.reciever}</p>
 
-                    </div>
-                ))
-                :
-                <div>
-                    <p className="text-gray-400 text-lg">No Contacts...</p>
-                </div>
+                            </div>
+                        ))
+                        :
+                        <div>
+                            <p className="text-gray-400 text-lg">No Contacts...</p>
+                        </div>
                 }
             </div>
         </div>
