@@ -5,8 +5,7 @@ import Navbar from "@/app/components/navbar"
 import { useAuth } from "@/app/context/AuthContext"
 type ContactType = {
     id: number,
-    sender: string,
-    reciever: string
+    contact: string
 }[]
 
 export default function Contacts() {
@@ -19,12 +18,16 @@ export default function Contacts() {
                     method: "GET"
                 });
 
-                if(!res.ok)
+                if (!res.ok)
                     console.log("Might be some issue while fetching data from Server");
-                
-const data = await res.json();
 
-                setContacts(data.Contacts);
+                const data = await res.json();
+                const formattedContacts = data.Contacts.map((item: any) => ({
+                id: item.id,
+                contact: item.sender === user?.username ? item.reciever : item.sender
+                }));
+
+                setContacts(formattedContacts);
             }
             catch (err) {
                 console.log("Error", err)
@@ -32,9 +35,9 @@ const data = await res.json();
         }
 
         fetchContacts();
-    },[user]);
+    }, [user]);
 
-    
+
     return (
         <div className="min-h-screen p-4 md:p-8">
             <Navbar />
@@ -45,7 +48,7 @@ const data = await res.json();
                         ?
                         contacts?.map((item) => (
                             <div key={item.id.toString()} className="bg-gray-800 w-[90%] md:w-100 py-2 md:py-5 px-5 rounded ml-[5%] flex flex-col gap-5">
-                                <p>{item.reciever}</p>
+                                <p>{item.contact}</p>
 
                             </div>
                         ))
