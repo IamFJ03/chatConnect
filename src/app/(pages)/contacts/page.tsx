@@ -5,12 +5,13 @@ import Navbar from "@/app/components/navbar"
 import { useAuth } from "@/app/context/AuthContext"
 type ContactType = {
     id: number,
-    reciever: string,
-    email: string
+    sender: string,
+    reciever: string
 }[]
 
 export default function Contacts() {
     const { user } = useAuth();
+    const [contacts, setContacts] = useState<ContactType>([])
     useEffect(() => {
         const fetchContacts = async () => {
             try {
@@ -19,7 +20,11 @@ export default function Contacts() {
                 });
 
                 if(!res.ok)
-                    console.log()
+                    console.log("Might be some issue while fetching data from Server");
+                
+const data = await res.json();
+
+                setContacts(data.Contacts);
             }
             catch (err) {
                 console.log("Error", err)
@@ -29,7 +34,7 @@ export default function Contacts() {
         fetchContacts();
     },[user]);
 
-    const [contacts, setContacts] = useState<ContactType>([])
+    
     return (
         <div className="min-h-screen p-4 md:p-8">
             <Navbar />

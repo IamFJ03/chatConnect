@@ -9,7 +9,11 @@ export async function GET(req: NextRequest) {
     if(fetch.rows.length === 0)
         return Response.json({message:"No Contacts Found"},{status:200});
 
-    const contacts = fetch.rows;
+    const contacts = fetch.rows.map(e => ({
+        id: e.id,
+        sender: e.sender,
+        reciever: e.reciever
+    }));
     console.log("Contacts Fetched", contacts)
     return Response.json({ message: "Server Side Success", Contacts: contacts }, { status: 200 })
 }
