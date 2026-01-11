@@ -4,7 +4,7 @@ import { createContext, ReactNode,useContext,useState } from "react";
 type chatUserType = {
     id: number,
     username: string,
-    email: string
+    email: string,
 }
 
 type UserContextType = {

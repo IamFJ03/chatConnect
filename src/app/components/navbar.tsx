@@ -1,19 +1,37 @@
 "use client"
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UserCircle, X, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [isProfile, setIsProfile] = useState(false);
-  const { user } = useAuth();
+  const [preview, setPreview] = useState("");
+  const { user, setUser } = useAuth();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleLogOut = () => {
     console.log("LoggedOut")
     router.replace("/authentication")
+  }
+
+  const handleImageUpload = (e: any) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageURL = URL.createObjectURL(file);
+    setUser(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        profilePicture: imageURL,
+      };
+    });
   }
 
   return (
@@ -29,8 +47,21 @@ export default function Navbar() {
         <div>
           <div className="w-full flex flex-col items-center border-b border-gray-800">
             <div className="bg-black w-fit h-fit rounded-full mt-15">
-              <UserCircle size={80} color="gray" />
+              {
+                user?.profilePicture
+                  ?
+                  <Image src={user?.profilePicture} alt="Profile image" width={300} height={300} unoptimized className="h-30 w-30 rounded-full"/>
+                  :
+                  <UserCircle size={80} color="gray" onClick={() => fileInputRef.current?.click()} />
+              }
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+            />
             <p className="text-gray-800 text-2xl font-bold my-5">{user?.username}</p>
           </div>
           <div className="p-5 absolute bottom-0 w-full">

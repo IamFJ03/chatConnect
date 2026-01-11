@@ -4,7 +4,8 @@ import react, { useState, createContext, useContext, ReactNode } from 'react';
 type User = {
     id: number,
     username: string,
-    email: string
+    email: string,
+    profilePicture: string
 }
 
 type AuthContextType = {
