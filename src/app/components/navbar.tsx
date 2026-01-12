@@ -19,11 +19,19 @@ export default function Navbar() {
     router.replace("/authentication")
   }
 
-  const handleImageUpload = (e: any) => {
+  const handleImageUpload = async (e: any) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const formdata = new FormData();
+    formdata.append("profilePicture", file);
     const imageURL = URL.createObjectURL(file);
+    const res = await fetch("/api/connection/user",{
+      method: "POST",
+      body: formdata
+    });
+
+    if(!res.ok) console.log()
     setUser(prev => {
       if (!prev) return prev;
 
@@ -50,7 +58,7 @@ export default function Navbar() {
               {
                 user?.profilePicture
                   ?
-                  <Image src={user?.profilePicture} alt="Profile image" width={300} height={300} unoptimized className="h-30 w-30 rounded-full"/>
+                  <Image src={user?.profilePicture} alt="Profile image" width={300} height={300} unoptimized className="h-30 w-30 rounded-full" />
                   :
                   <UserCircle size={80} color="gray" onClick={() => fileInputRef.current?.click()} />
               }

@@ -15,3 +15,11 @@ export async function GET(req: NextRequest){
         data: user
     },{status:200})
 }
+
+export async function POST(req: Request){
+    const body = await req.formData();
+    const file = body.get("profilePicture") as File;
+
+    console.log(file)
+    return Response.json({message:"Succesfully got image"},{status:200})
+}
