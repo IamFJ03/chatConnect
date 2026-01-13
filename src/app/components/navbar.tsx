@@ -21,10 +21,11 @@ export default function Navbar() {
 
   const handleImageUpload = async (e: any) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !user?.username) return;
 
     const formdata = new FormData();
     formdata.append("profilePicture", file);
+    formdata.append("username", user.username);
     const imageURL = URL.createObjectURL(file);
     const res = await fetch("/api/connection/user",{
       method: "POST",

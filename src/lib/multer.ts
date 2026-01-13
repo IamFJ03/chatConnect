@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
     },
 
     filename: (req:any, file:any, cb:any) => {
-        
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
