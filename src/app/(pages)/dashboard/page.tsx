@@ -13,17 +13,28 @@ import Link from "next/link";
 
 export default function Dashboard() {
   const { socket } = useSocket();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { chatUser } = useUser();
 
   useEffect(() => {
     if (!user) return;
-
     socket?.emit("userRegister", user);
-
   }, [user]);
 
+  useEffect(() => {
+    const fetchInfo = async () => {
+      const res = await fetch("api/auth/me", {
+        credentials: "include"
+      });
 
+      if (res.status === 401) throw new Error("Unauthorized");
+
+      const body = await res.json();
+      setUser(body.user);
+    }
+
+    fetchInfo();
+  }, [])
 
   return (
     <div className="min-h-screen p-4 md:p-8">
