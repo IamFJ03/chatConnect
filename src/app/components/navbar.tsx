@@ -49,7 +49,13 @@ export default function Navbar() {
       <div className="flex gap-6 text-sm md:text-lg items-center">
         <Link href="/notification">Notifications</Link>
         <Link href="/contacts">Contacts</Link>
-        <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
+        {
+          user?.profilePicture
+          ?
+          <Image src={user?.profilePicture} alt="profile image" width={30} height={30} unoptimized className="rounded-full h-10 w-10 cursor-pointer" onClick={() => setIsProfile(true)}/>
+          :
+          <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
+        }
       </div>
       <div className={`absolute h-screen md:w-[20%] rounded-2xl bg-gray-600 -top-10 ${isProfile ? 'right-0 scale-100 ' : '-right-100 scale-0 '} transition-all duration-500`}>
         <X size={25} color="gray" className="absolute right-5 top-5 cursor-pointer" onClick={() => setIsProfile(false)} />
