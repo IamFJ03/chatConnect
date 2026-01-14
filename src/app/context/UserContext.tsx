@@ -5,6 +5,7 @@ type chatUserType = {
     id: number,
     username: string,
     email: string,
+    profilePicture: string
 }
 
 type UserContextType = {

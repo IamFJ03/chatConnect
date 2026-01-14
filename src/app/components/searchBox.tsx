@@ -9,6 +9,7 @@ type SearchedUser = {
     id: number;
     username: string;
     email: string;
+    profilePicture: string
 };
 
 type permissionInfo = {
@@ -24,7 +25,7 @@ export default function SearchBox() {
     const [notificationModal, setNotificationModal] = useState(false);
     const [modalInfo, setModalInfo] = useState<permissionInfo | null>(null);
     const [searchedUser, setSearchedUser] = useState<SearchedUser | null>(null);
-    const {chatUser, setChatUser} = useUser();
+    const { setChatUser} = useUser();
     const { user } = useAuth();
     const [searchUser, setSearchUser] = useState("");
 
