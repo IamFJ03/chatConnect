@@ -40,7 +40,7 @@ export default function Navbar() {
       body: formdata
     });
 
-    if (!res.ok) console.log()
+    if (!res.ok) console.log("Something went wrong while profile picture uploading...")
     setUser(prev => {
       if (!prev) return prev;
 
@@ -65,7 +65,7 @@ export default function Navbar() {
             <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
         }
       </div>
-      <div className={`absolute h-screen md:w-[20%] rounded-2xl bg-gray-600 -top-10 ${isProfile ? 'right-0 scale-100 ' : '-right-100 scale-0 '} transition-all duration-500`}>
+      <div className={`absolute h-screen md:w-[20%] w-[65%] rounded-2xl bg-gray-600 md:-top-10 -top-5 ${isProfile ? 'right-0 scale-100 ' : '-right-100 scale-0 '} transition-all duration-500`}>
         <X size={25} color="gray" className="absolute right-5 top-5 cursor-pointer" onClick={() => setIsProfile(false)} />
         <div>
           <div className="w-full flex flex-col items-center border-b border-gray-800">
