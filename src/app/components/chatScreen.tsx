@@ -73,7 +73,7 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
                             {
                                 chatUser?.profilePicture
                                 ?
-                                <Image src={chatUser.profilePicture} alt="profile Picture" />
+                                <Image src={chatUser.profilePicture} alt="profile Picture" width={20} height={20} className="h-10 w-10 rounded-full"/>
                                 :
                                 <UserCircle size={25} color="gray" />
                             }

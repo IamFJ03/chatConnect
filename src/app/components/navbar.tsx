@@ -14,9 +14,17 @@ export default function Navbar() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     console.log("LoggedOut")
-    router.replace("/authentication")
+    const res = await fetch("/api/auth/logout",{
+      method:"POST",
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("Something went wrong while Logging out!");
+
+    const data = await res.json();
+    if (data.message === "Logged out successfully")
+      router.replace("/authentication")
   }
 
   const handleImageUpload = async (e: any) => {
@@ -27,12 +35,12 @@ export default function Navbar() {
     formdata.append("profilePicture", file);
     formdata.append("username", user.username);
     const imageURL = URL.createObjectURL(file);
-    const res = await fetch("/api/connection/user",{
+    const res = await fetch("/api/connection/user", {
       method: "POST",
       body: formdata
     });
 
-    if(!res.ok) console.log()
+    if (!res.ok) console.log()
     setUser(prev => {
       if (!prev) return prev;
 
@@ -51,10 +59,10 @@ export default function Navbar() {
         <Link href="/contacts">Contacts</Link>
         {
           user?.profilePicture
-          ?
-          <Image src={user?.profilePicture} alt="profile image" width={30} height={30} unoptimized className="rounded-full h-10 w-10 cursor-pointer" onClick={() => setIsProfile(true)}/>
-          :
-          <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
+            ?
+            <Image src={user?.profilePicture} alt="profile image" width={30} height={30} unoptimized className="rounded-full h-10 w-10 cursor-pointer" onClick={() => setIsProfile(true)} />
+            :
+            <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
         }
       </div>
       <div className={`absolute h-screen md:w-[20%] rounded-2xl bg-gray-600 -top-10 ${isProfile ? 'right-0 scale-100 ' : '-right-100 scale-0 '} transition-all duration-500`}>
