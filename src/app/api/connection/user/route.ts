@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
     if (search.rows.length === 0) return Response.json({ message: "User Not Found" }, { status: 400 })
 
     const user = search.rows[0];
+    console.log("User", user)
     return Response.json({
         message: "User Found",
         data: user

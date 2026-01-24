@@ -33,7 +33,8 @@ export default function ChatScreen({ chatUser, currentUserId }: chatUserProps) {
         }
         socket?.emit("fetchMessages", fetchingInfo);
         socket?.on("sendingFetchedData", (data) => {
-            const parsedMessage = data?.messages.map((m: string) => typeof m === "string" ? JSON.parse(m) : m)
+            const messages = Array.isArray(data?.messages) ? data.messages : [];
+            const parsedMessage = messages.map((m: string) => typeof m === "string" ? JSON.parse(m) : m)
             console.log(parsedMessage)
             setMessageList(parsedMessage)
         })

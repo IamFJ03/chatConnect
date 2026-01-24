@@ -37,7 +37,7 @@ export default function Login() {
         console.log("data:", data?.userInfo);
         setUser(data?.userInfo);
         if(data?.message==="Login Successfull"){
-            router.push("/dashboard")
+            router.push("/")
         }
     }
 

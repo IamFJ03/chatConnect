@@ -53,7 +53,7 @@ export default function Navbar() {
 
   return (
     <div className="relative flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-      <p className="text-xl md:text-2xl font-semibold">Dashboard</p>
+      <p className="text-xl md:text-2xl font-semibold">ChatConnect</p>
       <div className="flex gap-6 text-sm md:text-lg items-center">
         <Link href="/notification">Notifications</Link>
         <Link href="/contacts">Contacts</Link>
@@ -65,7 +65,7 @@ export default function Navbar() {
             <UserCircle size={25} color="white" className="cursor-pointer" onClick={() => setIsProfile(true)} />
         }
       </div>
-      <div className={`absolute h-screen md:w-[20%] w-[65%] rounded-2xl bg-gray-600 md:-top-10 -top-5 ${isProfile ? 'right-0 scale-100 ' : '-right-100 scale-0 '} transition-all duration-500`}>
+      <div className={`absolute h-screen md:w-[20%] w-[70%] rounded-2xl bg-gray-600 md:-top-10 -top-5 ${isProfile ? 'left-0 scale-100 ' : '-left-100 scale-0 '} transition-all duration-500`}>
         <X size={25} color="gray" className="absolute right-5 top-5 cursor-pointer" onClick={() => setIsProfile(false)} />
         <div>
           <div className="w-full flex flex-col items-center border-b border-gray-800">
