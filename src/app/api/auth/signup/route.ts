@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import joi from "joi";
 import bcrypt from "bcryptjs";
 import { pool } from "@/lib/db";

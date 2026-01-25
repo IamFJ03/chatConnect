@@ -1,17 +1,20 @@
-import { cookies } from "next/headers";
+export const runtime = "nodejs"
 
+import { NextResponse } from "next/server";
 export async function POST(){
 try{
-const cookieStore = await cookies();
-cookieStore.delete("auth_token");
 
-return Response.json(
+const res = NextResponse.json(
       { message: "Logged out successfully" },
       { status: 200 }
     );
+    
+    res.cookies.delete("auth_token")
+
+    return res;
 }
 catch(e){
-    return Response.json(
+    return NextResponse.json(
       { message: "Logout failed" },
       { status: 500 }
     );
