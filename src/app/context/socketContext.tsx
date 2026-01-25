@@ -29,7 +29,6 @@ export function SocketProvider({
         const socketInstance = io("/", {
             path: "/api/socket"
         })
-
         
         socketRef.current = socketInstance;
         setSocket(socketInstance);
