@@ -8,7 +8,10 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: "https://chat-connect-pink.vercel.app",
+    credentials: true
+}));
 
 const server = http.createServer(app);
 
