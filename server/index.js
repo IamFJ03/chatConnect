@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { pool } from "./db";
+import { pool } from "./db.js";
 
 const app = express();
 
