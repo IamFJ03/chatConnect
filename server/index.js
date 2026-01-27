@@ -23,7 +23,7 @@ const io = new Server(server, {
   },
 });
 
-const UserMapping = new Map<string, string>();
+const UserMapping = new Map();
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
