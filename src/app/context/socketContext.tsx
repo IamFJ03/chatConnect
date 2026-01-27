@@ -28,7 +28,7 @@ export function SocketProvider({
         if (socketRef.current) return;
         const socketInstance = io("https://chatconnect-m4d5.onrender.com",{
             withCredentials: true,
-            transports: ['websocket', 'polling']
+            transports: ['polling', 'websocket']
         })
         
         socketRef.current = socketInstance;
