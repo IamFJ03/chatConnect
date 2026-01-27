@@ -26,11 +26,11 @@ export function SocketProvider({
     const socketRef = useRef<Socket | null>(null)
     useEffect(() => {
         if (socketRef.current) return;
-        const socketInstance = io("https://chatconnect-m4d5.onrender.com",{
-            withCredentials: true,
-            transports: ['polling', 'websocket']
-        })
-        
+        const socketInstance = io("https://chatconnect-m4d5.onrender.com", {
+            transports: ["websocket"],
+            upgrade: false
+        });
+
         socketRef.current = socketInstance;
         setSocket(socketInstance);
     }, [])

@@ -18,6 +18,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "https://chat-connect-pink.vercel.app",
+    methods: ["GET", "POST"],
     credentials: true
   },
 });
